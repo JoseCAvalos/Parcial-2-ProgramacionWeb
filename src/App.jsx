@@ -48,7 +48,7 @@ function App() {
     <div className="contenedor">
       <h1>Registro de Productos</h1>
 
-      <p>Sistema de consulta y búsqueda de productos</p>
+      <p>Sistema de inventario, consulta y búsqueda de productos</p>
 
       <input
         type="text"
