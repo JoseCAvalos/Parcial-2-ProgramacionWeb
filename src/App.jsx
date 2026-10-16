@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function TablaProductos({ productos }) {
@@ -30,16 +30,35 @@ function TablaProductos({ productos }) {
 }
 
 function App() {
+  const [productos, setProductos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
 
-  const productos = [
-    { id: 1, nombre: "Laptop Lenovo", categoria: "Computación", precio: 5500, stock: 10 },
-    { id: 2, nombre: "Mouse Logitech", categoria: "Accesorios", precio: 250, stock: 25 },
-    { id: 3, nombre: "Teclado Mecánico", categoria: "Accesorios", precio: 450, stock: 15 },
-    { id: 4, nombre: "Monitor Samsung", categoria: "Monitores", precio: 1800, stock: 8 },
-    { id: 5, nombre: "Audífonos Sony", categoria: "Audio", precio: 950, stock: 12 },
-  ];
+  // Obtener productos desde la API REST
+  useEffect(() => {
+    async function obtenerProductos() {
+      try {
+        const respuesta = await fetch("http://localhost:3000/api/productos");
 
+        if (!respuesta.ok) {
+          throw new Error("Error al consultar los productos");
+        }
+
+        const datos = await respuesta.json();
+
+        setProductos(datos);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setCargando(false);
+      }
+    }
+
+    obtenerProductos();
+  }, []);
+
+  // Filtrar productos por nombre
   const productosFiltrados = productos.filter((producto) =>
     producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -57,9 +76,19 @@ function App() {
         onChange={(e) => setBusqueda(e.target.value)}
       />
 
-      <TablaProductos productos={productosFiltrados} />
+      {cargando ? (
+        <p>Cargando productos...</p>
+      ) : error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <>
+          <TablaProductos productos={productosFiltrados} />
 
-      <p>Total de productos encontrados: {productosFiltrados.length}</p>
+          <p>
+            Total de productos encontrados: {productosFiltrados.length}
+          </p>
+        </>
+      )}
     </div>
   );
 }

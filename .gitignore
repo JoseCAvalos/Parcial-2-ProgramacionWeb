@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Ignorar dependencias de Node.js en cualquier carpeta
+**/node_modules/
